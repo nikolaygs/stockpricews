@@ -8,6 +8,16 @@ import (
 	"time"
 )
 
+// Repository layer used to query stock_quote historical data. The table has the following definition:
+//
+// CREATE TABLE `stock_quote` (
+//    `id` int NOT NULL AUTO_INCREMENT,
+//    `symbol` varchar(4) NOT NULL,
+//    `price` double DEFAULT NULL,
+//    `datepoint` timestamp NULL DEFAULT NULL,
+//  PRIMARY KEY (`id`),
+//  KEY `symbol` (`symbol`,`datepoint`)
+//) ENGINE=InnoDB AUTO_INCREMENT=529 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci |
 type DBRepository struct {
 	db *sql.DB
 }
