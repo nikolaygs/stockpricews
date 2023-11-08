@@ -1,5 +1,5 @@
 # Overview
-The service provides a simplistic RESTFUL API that calculates the maximum profit that could have been realized by trading 
+The service provides a simplistic RESTful API that calculates the maximum profit that could have been realized by trading 
 specific stock in a given historical time slice.
 
 ### Endpoints
@@ -52,7 +52,7 @@ Content-Length: 67
         port of the local mysql instance (default 3306)
 ```
 
-# Setup database
+# Setup a database
 The repo comes with hardcoded predefined dump `data/dump.sql` if you want to use it for test purposes please follow the steps:
 1. Run the following command to initialize MySQL docker container - provide password and a local port to run the instance
 
@@ -60,7 +60,7 @@ The repo comes with hardcoded predefined dump `data/dump.sql` if you want to use
 
 2. Create the stockquotedb database
 
-   `mysql --host 127.0.0.1 --port <port> -p<password> -e "CREATE DATABASE stockquotedb"`
+   `mysql --host 127.0.0.1 -uroot --port <port> -p<password> -e "CREATE DATABASE stockquotedb"`
 
 3. Import the local dump into the database
 
