@@ -6,6 +6,7 @@ CREATE TABLE `stock_quote` (
   `symbol` varchar(4) NOT NULL,
   `price` double DEFAULT NULL,
   `datepoint` timestamp NULL DEFAULT NULL,
+  INDEX (symbol, datepoint),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -519,6 +520,6 @@ INSERT INTO stock_quote(symbol, datepoint, price) VALUES('TSLA','2022-11-11',195
 INSERT INTO stock_quote(symbol, datepoint, price) VALUES('TSLA','2022-11-10',190.72);
 INSERT INTO stock_quote(symbol, datepoint, price) VALUES('TSLA','2022-11-09',177.59);
 INSERT INTO stock_quote(symbol, datepoint, price) VALUES('TSLA','2022-11-08',191.3);
-INSERT INTO stock_quote(symbol, datepoint, price) VALUES('TSLA,	'2022-11-07',197.08);
+INSERT INTO stock_quote(symbol, datepoint, price) VALUES('TSLA','2022-11-07',197.08);
 /*!40000 ALTER TABLE `stock_quote` ENABLE KEYS */;
 UNLOCK TABLES;
