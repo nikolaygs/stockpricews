@@ -90,7 +90,7 @@ func parseRequestData(r *http.Request) (entity.StockQuoteRequest, error) {
 
 	timeSlice := entity.StockQuoteRequest{Begin: time.Unix(begin, 0), End: time.Unix(end, 0)}
 	if timeSlice.Begin.After(timeSlice.End) {
-		return entity.StockQuoteRequest{}, fmt.Errorf("begin interval is after the end interval: %w", entity.ErrBadRequest)
+		return entity.StockQuoteRequest{}, fmt.Errorf("begin period is after the end period: %w", entity.ErrBadRequest)
 	}
 
 	symbol := r.URL.Query().Get("symbol")

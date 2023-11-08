@@ -29,19 +29,22 @@ func maxProfitForPeriod(history []entity.StockQuote) (entity.MaxProfitPoints, er
 		return entity.MaxProfitPoints{}, fmt.Errorf("no records found for the given period: %w", entity.ErrNotFound)
 	}
 
-	// TODO add comments on the algorithm
+	// holds the current max margin
 	maxMargin := float64(0)
+	// holds the current lowest price
 	lowestPrice := history[0].Price
 
-	currLowIdx, lowIdx, highIdx := 0, 0, 0
-
+	// indexes of current low price and the prices that were used to compute the max margin
+	var currLowIdx, lowIdx, highIdx int
 	for i := 1; i < len(history); i++ {
 		currentPrice := history[i].Price
 		margin := currentPrice - lowestPrice
 		if margin < 0 {
+			// new lowest price - update the price and indexes
 			lowestPrice = currentPrice
 			currLowIdx = i
 		} else if margin > maxMargin {
+			// new max margin - update the margin and indexes
 			maxMargin = margin
 			highIdx = i
 			lowIdx = currLowIdx
@@ -53,7 +56,7 @@ func maxProfitForPeriod(history []entity.StockQuote) (entity.MaxProfitPoints, er
 	}
 
 	return entity.MaxProfitPoints{
-		BuyPoint:  entity.TradePoint{history[lowIdx].Price, history[lowIdx].Datepoint},
-		SellPoint: entity.TradePoint{history[highIdx].Price, history[highIdx].Datepoint},
+		BuyPoint:  entity.TradePoint{Price: history[lowIdx].Price, Date: history[lowIdx].Datepoint},
+		SellPoint: entity.TradePoint{Price: history[highIdx].Price, Date: history[highIdx].Datepoint},
 	}, nil
 }

@@ -1,5 +1,6 @@
 # Overview
-The service provides a simplistic RESTFUL API that calculates the maximum profit that could have been realized by trading specif stock in a given time slice.
+The service provides a simplistic RESTFUL API that calculates the maximum profit that could have been realized by trading 
+specific stock in a given historical time slice.
 
 ### Endpoints
 The service exposes just 1 endpoint:
@@ -16,17 +17,17 @@ The service exposes just 1 endpoint:
 ```json
 {
    "buyPoint":{
-      "price":40.62, // price at the buy point 
-      "date":"2023-10-26T00:00:00Z" // date point of buy operation
+      "price":40.62,
+      "date":"2023-10-26T00:00:00Z"
    },
    "sellPoint":{
-      "price":47.75, // price at the sell point 
-      "date":"2023-11-03T00:00:00Z" // date point of sell operation
+      "price":47.75,
+      "date":"2023-11-03T00:00:00Z"
    }
 }
 ```
 * If server fails to process the query a client or server error message is returned:
-```azure
+```bash
 HTTP/1.1 400 Bad Request
 Access-Control-Allow-Origin: *
 Content-Type: application/json
@@ -36,23 +37,10 @@ Content-Length: 67
 {"message":"begin period is after the end period: bad request"}  
 ```
 
-# Setup database
-1. Run the following command to initialize MySQL docker container - provide password and a local port to run the instance
-
-    ```docker run --name stock-quote-db -e MYSQL_ROOT_PASSWORD=<password> -p <port>:3306 -d mysql:latest```
-
-2. Create the stockquotedb database
-
-   `mysql --host 127.0.0.1 --port <port> -p<password> -e "CREATE DATABASE stockquotedb"`
-
-3. Import the local dump into the database
-
-    `docker exec -i stock-quote-db sh -c 'exec mysql -uroot -P<PORT> -p<PASS> stockquotedb' < data/dump.sql`
-
-# Start the local server
+# Start the service locally
 `go run . -server.port=<server_port_for_http> -db.user=root -db.pass=<pass> -db.port=<db_port>`
 
-# Usage
+### Usage
 ```
   -server.port int
         port to listen for incoming http requests (default 8080)
@@ -63,6 +51,20 @@ Content-Length: 67
   -db.port int
         port of the local mysql instance (default 3306)
 ```
+
+# Setup database
+The repo comes with hardcoded predefined dump `data/dump.sql` if you want to use it for test purposes please follow the steps:
+1. Run the following command to initialize MySQL docker container - provide password and a local port to run the instance
+
+   ```docker run --name stock-quote-db -e MYSQL_ROOT_PASSWORD=<password> -p <port>:3306 -d mysql:latest```
+
+2. Create the stockquotedb database
+
+   `mysql --host 127.0.0.1 --port <port> -p<password> -e "CREATE DATABASE stockquotedb"`
+
+3. Import the local dump into the database
+
+   `docker exec -i stock-quote-db sh -c 'exec mysql -uroot -P<PORT> -p<PASS> stockquotedb' < data/dump.sql`
 
 
 # Run tests
