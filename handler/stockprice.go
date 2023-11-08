@@ -62,7 +62,7 @@ func parseRequestData(r *http.Request) (entity.StockQuoteRequest, error) {
 		return entity.StockQuoteRequest{}, fmt.Errorf("failed to read request URL: %w", entity.ErrBadRequest)
 	}
 
-	if r.Method != "GET" {
+	if !(r.Method == "GET" || r.Method == "HEAD" || r.Method == "OPTIONS") {
 		return entity.StockQuoteRequest{}, fmt.Errorf("method %s not allowed: %w", r.Method, entity.ErrMethodNotAllowed)
 	}
 

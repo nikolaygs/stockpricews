@@ -13,7 +13,7 @@ import (
 func main() {
 	serverPort := flag.Int("server.port", 8080, "port to listen for incoming http requests")
 	dbUser := flag.String("db.user", "root", "username to access the local mysql instance")
-	dbPass := flag.String("db.pass", "niki123", "password to access the local mysql instance")
+	dbPass := flag.String("db.pass", "", "password to access the local mysql instance")
 	dbPort := flag.Int("db.port", 8181, "port of the local mysql instance")
 
 	flag.Parse()
