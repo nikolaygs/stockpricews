@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
+	"golang.org/x/time/rate"
+	_ "golang.org/x/time/rate"
 	"net/http"
 	"stockpricews/controller"
 	"stockpricews/entity"
@@ -19,7 +20,7 @@ type StockPriceHandler struct {
 // New initializes new StockPriceHandler that currently provides just one REST endpoint 'GET /maxprofit'
 func New(controller controller.Controller, port int) (StockPriceHandler, error) {
 	handerImpl := StockPriceHandler{Controller: controller}
-	http.HandleFunc("/maxprofit", handerImpl.MaxProfitForPeriod)
+	http.Handle("/maxprofit", rateLimiter(handerImpl.MaxProfitForPeriod))
 	err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 	return handerImpl, err
 }
@@ -30,6 +31,7 @@ func New(controller controller.Controller, port int) (StockPriceHandler, error) 
 //  - 200 OK - when a profit can be realized within the given time slice. Body contains entity.MaxProfitPoints as json
 //  - 400 Bad Request - if any of the query params is not passed or doesn't have a correct format (seconds). Body contains entity.ErrorMessage as json so the client can handle it accordingly
 //  - 404 Not Found - if stock quote data can't be found for the given time slice or it's not possible to realize a profit. Body contains entity.ErrorMessage as json so the client can handle it accordingly
+//  - 429 Too Many Requests if the client got rate limited.
 //  - 500 Intenal Server Error - if any expected error occur.
 func (h StockPriceHandler) MaxProfitForPeriod(w http.ResponseWriter, r *http.Request) {
 	// Access-Control-Allow-Origin is set as the client might run in a separate machine
@@ -51,10 +53,23 @@ func (h StockPriceHandler) MaxProfitForPeriod(w http.ResponseWriter, r *http.Req
 	}
 
 	// Marshal the response to JSON and report successful execution
-	maxProfitPricesJSON, _ := json.Marshal(maxProfitPrices) // this shouldn't happen for simplicity we won't handle the error explicitly
-
 	w.WriteHeader(http.StatusOK)
-	io.WriteString(w, string(maxProfitPricesJSON))
+	json.NewEncoder(w).Encode(maxProfitPrices)
+}
+
+// Simple rate limiting using Token Bucket
+func rateLimiter(next func(w http.ResponseWriter, r *http.Request)) http.Handler {
+	limiter := rate.NewLimiter(2, 4)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !limiter.Allow() {
+			errMsg := entity.ErrorMessage{Message: "The API is at capacity, try again later."}
+			w.WriteHeader(http.StatusTooManyRequests)
+			json.NewEncoder(w).Encode(errMsg)
+			return
+		} else {
+			next(w, r)
+		}
+	})
 }
 
 func parseRequestData(r *http.Request) (entity.StockQuoteRequest, error) {
@@ -107,7 +122,7 @@ func writeErrorToStatusCodeAndMessage(err error, w http.ResponseWriter) {
 	fmt.Println(err)
 
 	statusCode := 200
-	body := errorAsJSON(err)
+	errMsg := err.Error()
 	if errors.Is(err, entity.ErrBadRequest) {
 		statusCode = http.StatusBadRequest
 	} else if errors.Is(err, entity.ErrNotFound) {
@@ -117,15 +132,9 @@ func writeErrorToStatusCodeAndMessage(err error, w http.ResponseWriter) {
 	} else {
 		// we don't want to leak internal messages to the client
 		statusCode = http.StatusInternalServerError
-		body = "Internal server error"
+		errMsg = "Internal server error"
 	}
 
 	w.WriteHeader(statusCode)
-	io.WriteString(w, body)
-}
-
-func errorAsJSON(err error) string {
-	errMsg := entity.ErrorMessage{Message: err.Error()}
-	res, _ := json.Marshal(errMsg) // this shouldn't happen for simplicity we won't handle the error explicitly
-	return string(res)
+	json.NewEncoder(w).Encode(entity.ErrorMessage{Message: errMsg})
 }
