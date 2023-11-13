@@ -13,6 +13,12 @@ import (
 	"time"
 )
 
+const (
+	begin  = "begin"
+	end    = "end"
+	symbol = "symbol"
+)
+
 type StockPriceHandler struct {
 	Controller controller.Controller
 }
@@ -77,42 +83,42 @@ func parseRequestData(r *http.Request) (entity.StockQuoteRequest, error) {
 		return entity.StockQuoteRequest{}, fmt.Errorf("failed to read request URL: %w", entity.ErrBadRequest)
 	}
 
-	if !(r.Method == "GET" || r.Method == "HEAD" || r.Method == "OPTIONS") {
+	if !(r.Method == http.MethodGet || r.Method == http.MethodHead || r.Method == http.MethodOptions) {
 		return entity.StockQuoteRequest{}, fmt.Errorf("method %s not allowed: %w", r.Method, entity.ErrMethodNotAllowed)
 	}
 
-	if !r.URL.Query().Has("begin") {
-		return entity.StockQuoteRequest{}, fmt.Errorf("begin param is missing: %w", entity.ErrBadRequest)
+	if !r.URL.Query().Has(begin) {
+		return entity.StockQuoteRequest{}, fmt.Errorf("%s param is missing: %w", begin, entity.ErrBadRequest)
 	}
 
-	if !r.URL.Query().Has("end") {
-		return entity.StockQuoteRequest{}, fmt.Errorf("end param is missing: %w", entity.ErrBadRequest)
+	if !r.URL.Query().Has(end) {
+		return entity.StockQuoteRequest{}, fmt.Errorf("%s param is missing: %w", end, entity.ErrBadRequest)
 	}
 
-	if !r.URL.Query().Has("symbol") {
-		return entity.StockQuoteRequest{}, fmt.Errorf("symbol param is missing: %w", entity.ErrBadRequest)
+	if !r.URL.Query().Has(symbol) {
+		return entity.StockQuoteRequest{}, fmt.Errorf("%s param is missing: %w", symbol, entity.ErrBadRequest)
 	}
 
-	begin, err := strconv.ParseInt(r.URL.Query().Get("begin"), 10, 64)
+	beginSecs, err := strconv.ParseInt(r.URL.Query().Get(begin), 10, 64)
 	if err != nil {
-		return entity.StockQuoteRequest{}, fmt.Errorf("begin param can't be parsed as seconds: %w", entity.ErrBadRequest)
+		return entity.StockQuoteRequest{}, fmt.Errorf("%s param can't be parsed as seconds: %w", begin, entity.ErrBadRequest)
 	}
 
-	end, err := strconv.ParseInt(r.URL.Query().Get("end"), 10, 64)
+	endSecs, err := strconv.ParseInt(r.URL.Query().Get("end"), 10, 64)
 	if err != nil {
-		return entity.StockQuoteRequest{}, fmt.Errorf("end param can't be parsed as seconds: %w", entity.ErrBadRequest)
+		return entity.StockQuoteRequest{}, fmt.Errorf("%s param can't be parsed as seconds: %w", end, entity.ErrBadRequest)
 	}
 
-	timeSlice := entity.StockQuoteRequest{Begin: time.Unix(begin, 0), End: time.Unix(end, 0)}
+	timeSlice := entity.StockQuoteRequest{Begin: time.Unix(beginSecs, 0), End: time.Unix(endSecs, 0)}
 	if timeSlice.Begin.After(timeSlice.End) {
 		return entity.StockQuoteRequest{}, fmt.Errorf("begin period is after the end period: %w", entity.ErrBadRequest)
 	}
 
-	symbol := r.URL.Query().Get("symbol")
-	if len(symbol) < 1 || len(symbol) > 4 {
+	stockSymbol := r.URL.Query().Get(symbol)
+	if len(stockSymbol) < 1 || len(stockSymbol) > 4 {
 		return entity.StockQuoteRequest{}, fmt.Errorf("stock symbol must be between 1 and 4 chars long: %w", entity.ErrBadRequest)
 	}
-	timeSlice.Symbol = symbol
+	timeSlice.Symbol = stockSymbol
 
 	return timeSlice, nil
 }
