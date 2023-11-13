@@ -47,14 +47,14 @@ func (h StockPriceHandler) MaxProfitForPeriod(w http.ResponseWriter, r *http.Req
 	// Parse request data and report BadRequest if any of the params can't be found/parsed
 	timeSlice, err := parseRequestData(r)
 	if err != nil {
-		writeErrorToStatusCodeAndMessage(err, w)
+		respondWithError(err, w)
 		return
 	}
 
 	// Calculate max profit for the given time slice and report error if any
 	maxProfitPrices, err := h.Controller.MaxProfitForPeriod(timeSlice)
 	if err != nil {
-		writeErrorToStatusCodeAndMessage(err, w)
+		respondWithError(err, w)
 		return
 	}
 
@@ -123,7 +123,7 @@ func parseRequestData(r *http.Request) (entity.StockQuoteRequest, error) {
 	return timeSlice, nil
 }
 
-func writeErrorToStatusCodeAndMessage(err error, w http.ResponseWriter) {
+func respondWithError(err error, w http.ResponseWriter) {
 	// log the error at the server log for debug purposes
 	fmt.Println(err)
 
