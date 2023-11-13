@@ -2,13 +2,13 @@ DROP TABLE IF EXISTS `stock_quote`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `stock_quote` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `symbol` varchar(4) NOT NULL,
-  `price` double DEFAULT NULL,
-  `datepoint` timestamp NULL DEFAULT NULL,
-  INDEX (symbol, datepoint),
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+   `id` int NOT NULL AUTO_INCREMENT,
+   `symbol` varchar(4) NOT NULL,
+   `price` double DEFAULT NULL,
+   `datepoint` timestamp NULL DEFAULT NULL,
+   PRIMARY KEY (`id`),
+   KEY `symbol` (`symbol`,`datepoint`)
+) ENGINE=InnoDB AUTO_INCREMENT=529 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
