@@ -112,21 +112,21 @@ func TestMaxProfitForPeriod_StatusCodes(t *testing.T) {
 			method:             "GET",
 			url:                "maxprofit?begin=1699228800&end=2699228800&symbol=UBER",
 			expectedStatusCode: http.StatusOK,
-			expectedBody:       `{"buyPoint":{"price":0,"date":"0001-01-01T00:00:00Z"},"sellPoint":{"price":0,"date":"0001-01-01T00:00:00Z"}}`,
+			expectedBody:       "{\"buyPoint\":{\"price\":0,\"date\":\"0001-01-01T00:00:00Z\"},\"sellPoint\":{\"price\":0,\"date\":\"0001-01-01T00:00:00Z\"}}\n",
 		},
 		{
 			name:               "Bad request",
 			method:             "GET",
 			url:                "maxprofit",
 			expectedStatusCode: http.StatusBadRequest,
-			expectedBody:       `{"message":"begin param is missing: bad request"}`,
+			expectedBody:       "{\"message\":\"begin param is missing: bad request\"}\n",
 		},
 		{
 			name:               "Non GET request",
 			method:             "POST",
 			url:                "maxprofit?begin=1699228800&end=2699228800&symbol=UBER",
 			expectedStatusCode: http.StatusMethodNotAllowed,
-			expectedBody:       `{"message":"method POST not allowed: method not allowed"}`,
+			expectedBody:       "{\"message\":\"method POST not allowed: method not allowed\"}\n",
 		},
 	}
 
